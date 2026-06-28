@@ -6,7 +6,7 @@ struct CliplyApp: App {
 
     var body: some Scene {
         MenuBarExtra("Cliply", systemImage: "doc.on.clipboard") {
-            PopupView(store: appDelegate.store)
+            PopupView(store: .shared)
         }
         .menuBarExtraStyle(.window)
     }

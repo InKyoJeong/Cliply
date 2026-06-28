@@ -6,11 +6,15 @@ import Observation
 @MainActor
 @Observable
 final class ClipboardStore {
+    /// Shared instance so the monitor, menu-bar popup and hotkey panel all
+    /// read and write the exact same history.
+    static let shared = ClipboardStore()
+
     private(set) var items: [ClipItem] = []
 
     var maxHistoryCount: Int = 1000
 
-    private let fileURL: URL
+    @ObservationIgnored private let fileURL: URL
 
     init(fileURL: URL? = nil) {
         self.fileURL = fileURL ?? Self.defaultFileURL()
