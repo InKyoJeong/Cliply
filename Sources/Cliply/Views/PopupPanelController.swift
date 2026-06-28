@@ -5,12 +5,14 @@ import SwiftUI
 @MainActor
 final class PopupPanelController {
     private let panel: FloatingPanel
+    private let store: ClipboardStore
 
     /// Called just before the panel becomes visible (e.g. to force an immediate
     /// clipboard check so the latest clip is present).
     var onWillShow: (() -> Void)?
 
     init(store: ClipboardStore) {
+        self.store = store
         panel = FloatingPanel(
             contentRect: NSRect(x: 0, y: 0, width: 360, height: 420),
             styleMask: [.titled, .fullSizeContentView, .nonactivatingPanel],
@@ -26,7 +28,6 @@ final class PopupPanelController {
         panel.standardWindowButton(.closeButton)?.isHidden = true
         panel.standardWindowButton(.miniaturizeButton)?.isHidden = true
         panel.standardWindowButton(.zoomButton)?.isHidden = true
-        panel.contentView = NSHostingView(rootView: PopupView(store: store))
 
         // Dismiss when the user clicks outside / switches apps, like a menu.
         NotificationCenter.default.addObserver(
@@ -53,6 +54,11 @@ final class PopupPanelController {
 
     private func show(relativeTo anchor: NSStatusBarButton?) {
         onWillShow?()
+
+        // Rebuild the content fresh on every open so the search field, selection
+        // and list always reflect the current history (no stale state).
+        panel.contentView = NSHostingView(rootView: PopupView(store: store))
+
         if let anchor, let anchorWindow = anchor.window {
             position(below: anchor, in: anchorWindow)
         } else {
