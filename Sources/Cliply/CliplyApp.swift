@@ -5,9 +5,11 @@ struct CliplyApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        MenuBarExtra("Cliply", systemImage: "doc.on.clipboard") {
-            PopupView(store: .shared)
+        // The UI is driven by a manually managed status item and a floating
+        // panel (see AppDelegate). This empty Settings scene just satisfies the
+        // App protocol's requirement for at least one scene.
+        Settings {
+            EmptyView()
         }
-        .menuBarExtraStyle(.window)
     }
 }
