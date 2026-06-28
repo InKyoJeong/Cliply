@@ -40,10 +40,66 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         statusItem.button?.target = self
         statusItem.button?.action = #selector(statusItemClicked)
+        statusItem.button?.sendAction(on: [.leftMouseUp, .rightMouseUp])
         self.statusItem = statusItem
     }
 
     @objc private func statusItemClicked() {
+        // Right-click (or control-click) opens the menu; left-click opens the popup.
+        let event = NSApp.currentEvent
+        let isRightClick = event?.type == .rightMouseUp
+            || event?.modifierFlags.contains(.control) == true
+        if isRightClick {
+            showMenu()
+        } else {
+            panel?.toggle(relativeTo: statusItem?.button)
+        }
+    }
+
+    private func showMenu() {
+        let menu = NSMenu()
+
+        let open = NSMenuItem(title: "Open Cliply", action: #selector(openPopup), keyEquivalent: "")
+        open.target = self
+        menu.addItem(open)
+
+        menu.addItem(.separator())
+
+        let clear = NSMenuItem(title: "Clear History", action: #selector(clearHistory), keyEquivalent: "")
+        clear.target = self
+        menu.addItem(clear)
+
+        menu.addItem(.separator())
+
+        let about = NSMenuItem(title: "About Cliply", action: #selector(showAbout), keyEquivalent: "")
+        about.target = self
+        menu.addItem(about)
+
+        let quit = NSMenuItem(title: "Quit Cliply", action: #selector(quit), keyEquivalent: "q")
+        quit.target = self
+        menu.addItem(quit)
+
+        // Attaching the menu and clicking pops it up, then we detach so the next
+        // left-click still opens the popup instead of the menu.
+        statusItem?.menu = menu
+        statusItem?.button?.performClick(nil)
+        statusItem?.menu = nil
+    }
+
+    @objc private func openPopup() {
         panel?.toggle(relativeTo: statusItem?.button)
+    }
+
+    @objc private func clearHistory() {
+        ClipboardStore.shared.clear()
+    }
+
+    @objc private func showAbout() {
+        NSApp.activate(ignoringOtherApps: true)
+        NSApp.orderFrontStandardAboutPanel(nil)
+    }
+
+    @objc private func quit() {
+        NSApp.terminate(nil)
     }
 }

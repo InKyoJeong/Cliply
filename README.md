@@ -20,6 +20,8 @@ Early development. Current focus:
 - [x] Fuzzy search over history
 - [x] History popup with keyboard navigation
 - [x] Global hotkey (⌘⇧V)
+- [x] Image clips (thumbnail preview)
+- [x] Menu bar menu (right-click: Open, Clear History, About, Quit)
 - [ ] Auto-paste into the previous app
 - [ ] Pin / favorites
 - [ ] iCloud sync
