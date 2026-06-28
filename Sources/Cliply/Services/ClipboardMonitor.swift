@@ -36,7 +36,9 @@ final class ClipboardMonitor {
         guard pasteboard.changeCount != lastChangeCount else { return }
         lastChangeCount = pasteboard.changeCount
 
+        guard PrivacyFilter.shouldStore(pasteboard) else { return }
         guard let item = ClipboardReader.read(from: pasteboard) else { return }
+        guard item.byteSize <= PrivacyFilter.maxItemBytes else { return }
         store.add(item)
     }
 }
