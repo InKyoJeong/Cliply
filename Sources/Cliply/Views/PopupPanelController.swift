@@ -15,7 +15,9 @@ final class PopupPanelController {
         self.store = store
         panel = FloatingPanel(
             contentRect: NSRect(x: 0, y: 0, width: 360, height: 420),
-            styleMask: [.titled, .fullSizeContentView, .nonactivatingPanel],
+            // No .nonactivatingPanel: the panel must become the key window so
+            // the search field receives keystrokes.
+            styleMask: [.titled, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
