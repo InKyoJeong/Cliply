@@ -9,14 +9,8 @@ struct CliplyApp: App {
 
     var body: some Scene {
         MenuBarExtra("Cliply", systemImage: "doc.on.clipboard") {
-            VStack(alignment: .leading) {
-                Text("Cliply")
-                    .font(.headline)
-                Text("\(store.items.count) items")
-                    .foregroundStyle(.secondary)
-            }
-            .padding()
-            .onAppear(perform: startMonitorIfNeeded)
+            PopupView(store: store)
+                .onAppear(perform: startMonitorIfNeeded)
         }
         .menuBarExtraStyle(.window)
     }
