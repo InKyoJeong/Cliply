@@ -25,6 +25,7 @@ struct PopupView: View {
             hintBar
         }
         .frame(width: 360, height: 420)
+        .ignoresSafeArea(.all)
         .background(WindowAccessor { window = $0 })
         .onKeyPress(.downArrow) { move(1); return .handled }
         .onKeyPress(.upArrow) { move(-1); return .handled }

@@ -57,7 +57,7 @@ final class PopupPanelController {
 
         // Rebuild the content fresh on every open so the search field, selection
         // and list always reflect the current history (no stale state).
-        panel.contentView = NSHostingView(rootView: PopupView(store: store))
+        panel.contentView = NoInsetHostingView(rootView: PopupView(store: store))
 
         if let anchor, let anchorWindow = anchor.window {
             position(below: anchor, in: anchorWindow)
@@ -97,4 +97,12 @@ final class PopupPanelController {
 /// An `NSPanel` that can become key so the search field receives keystrokes.
 final class FloatingPanel: NSPanel {
     override var canBecomeKey: Bool { true }
+}
+
+/// Hosting view that doesn't reserve safe-area space for the (hidden) title bar,
+/// so the content fills all the way to the top edge.
+final class NoInsetHostingView<Content: View>: NSHostingView<Content> {
+    override var safeAreaInsets: NSEdgeInsets {
+        NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+    }
 }
