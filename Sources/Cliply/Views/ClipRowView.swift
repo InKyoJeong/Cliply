@@ -40,7 +40,7 @@ struct ClipRowView: View {
 
     @ViewBuilder
     private var preview: some View {
-        if item.kind == .image, let data = item.imageData, let image = NSImage(data: data) {
+        if let data = item.imageData, let image = NSImage(data: data) {
             Image(nsImage: image)
                 .resizable()
                 .aspectRatio(contentMode: .fit)

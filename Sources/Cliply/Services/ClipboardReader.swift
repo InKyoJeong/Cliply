@@ -14,11 +14,15 @@ enum ClipboardReader {
            urls.contains(where: { $0.isFileURL }) {
             let paths = urls.filter(\.isFileURL).map(\.path)
             let joined = paths.joined(separator: "\n")
+            // If it's a single image file, generate a small thumbnail so the
+            // popup shows a preview (the clip still pastes as the file itself).
+            let thumb = paths.count == 1 ? thumbnail(forImageFileAt: paths[0]) : nil
             return ClipItem(
                 kind: .file,
                 contentHash: hash(joined),
                 title: paths.count == 1 ? (paths.first.map { ($0 as NSString).lastPathComponent } ?? joined) : "\(paths.count) files",
                 textValue: joined,
+                imageData: thumb,
                 byteSize: joined.utf8.count,
                 sourceAppBundleID: bundleID,
                 sourceAppName: appName
@@ -61,6 +65,38 @@ enum ClipboardReader {
     }
 
     // MARK: - Helpers
+
+    private static let imageExtensions: Set<String> = [
+        "png", "jpg", "jpeg", "gif", "heic", "heif", "tiff", "tif", "bmp", "webp"
+    ]
+
+    /// Returns a small PNG thumbnail for an image file, or nil for non-images.
+    private static func thumbnail(forImageFileAt path: String) -> Data? {
+        let ext = (path as NSString).pathExtension.lowercased()
+        guard imageExtensions.contains(ext), let image = NSImage(contentsOfFile: path) else {
+            return nil
+        }
+        return downsampledPNG(image, maxDimension: 64)
+    }
+
+    private static func downsampledPNG(_ image: NSImage, maxDimension: CGFloat) -> Data? {
+        let size = image.size
+        guard size.width > 0, size.height > 0 else { return nil }
+        let scale = min(1, maxDimension / max(size.width, size.height))
+        let target = NSSize(width: max(1, size.width * scale), height: max(1, size.height * scale))
+        guard let rep = NSBitmapImageRep(
+            bitmapDataPlanes: nil,
+            pixelsWide: Int(target.width), pixelsHigh: Int(target.height),
+            bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+            colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0
+        ) else { return nil }
+        rep.size = target
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
+        image.draw(in: NSRect(origin: .zero, size: target))
+        NSGraphicsContext.restoreGraphicsState()
+        return rep.representation(using: .png, properties: [:])
+    }
 
     private static func classify(_ text: String) -> ClipKind {
         if text.range(of: #"^https?://"#, options: .regularExpression) != nil {

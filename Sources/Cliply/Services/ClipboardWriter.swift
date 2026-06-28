@@ -11,6 +11,15 @@ enum ClipboardWriter {
             if let data = item.imageData {
                 pasteboard.setData(data, forType: .png)
             }
+        case .file:
+            // Restore the actual file references (plus the path as text fallback).
+            if let text = item.textValue {
+                let urls = text.split(separator: "\n").map { URL(fileURLWithPath: String($0)) as NSURL }
+                if !urls.isEmpty {
+                    pasteboard.writeObjects(urls)
+                }
+                pasteboard.setString(text, forType: .string)
+            }
         default:
             if let text = item.textValue {
                 pasteboard.setString(text, forType: .string)
