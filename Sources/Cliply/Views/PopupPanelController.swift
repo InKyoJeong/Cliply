@@ -6,6 +6,10 @@ import SwiftUI
 final class PopupPanelController {
     private let panel: FloatingPanel
 
+    /// Called just before the panel becomes visible (e.g. to force an immediate
+    /// clipboard check so the latest clip is present).
+    var onWillShow: (() -> Void)?
+
     init(store: ClipboardStore) {
         panel = FloatingPanel(
             contentRect: NSRect(x: 0, y: 0, width: 360, height: 420),
@@ -23,6 +27,18 @@ final class PopupPanelController {
         panel.standardWindowButton(.miniaturizeButton)?.isHidden = true
         panel.standardWindowButton(.zoomButton)?.isHidden = true
         panel.contentView = NSHostingView(rootView: PopupView(store: store))
+
+        // Dismiss when the user clicks outside / switches apps, like a menu.
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(panelDidResignKey),
+            name: NSWindow.didResignKeyNotification,
+            object: panel
+        )
+    }
+
+    @objc private func panelDidResignKey() {
+        panel.orderOut(nil)
     }
 
     /// Toggles the panel. When `anchor` is given (the status-item button), the
@@ -36,6 +52,7 @@ final class PopupPanelController {
     }
 
     private func show(relativeTo anchor: NSStatusBarButton?) {
+        onWillShow?()
         if let anchor, let anchorWindow = anchor.window {
             position(below: anchor, in: anchorWindow)
         } else {

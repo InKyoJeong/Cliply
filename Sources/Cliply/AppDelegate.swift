@@ -21,6 +21,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.monitor = monitor
 
         let panel = PopupPanelController(store: .shared)
+        panel.onWillShow = { [weak monitor] in monitor?.checkNow() }
         self.panel = panel
 
         let hotkey = HotkeyService()

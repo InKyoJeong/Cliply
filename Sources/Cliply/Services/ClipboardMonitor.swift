@@ -46,6 +46,13 @@ final class ClipboardMonitor {
         }
     }
 
+    /// Forces an immediate clipboard check — used right before showing the
+    /// popup so a clip copied a moment ago appears without waiting for the next
+    /// poll tick.
+    func checkNow() {
+        poll()
+    }
+
     private func poll() {
         guard pasteboard.changeCount != lastChangeCount else { return }
         lastChangeCount = pasteboard.changeCount
