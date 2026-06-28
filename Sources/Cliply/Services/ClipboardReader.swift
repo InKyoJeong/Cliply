@@ -46,7 +46,9 @@ enum ClipboardReader {
             let hasRichText = pasteboard.data(forType: .rtf) != nil
             return ClipItem(
                 kind: hasRichText ? .richText : kind,
-                contentHash: hash(string),
+                // Hash the normalized text so the same content copied again
+                // (e.g. with a trailing newline) de-duplicates instead of piling up.
+                contentHash: hash(trimmed),
                 title: summary(of: string),
                 textValue: string,
                 byteSize: string.utf8.count,
