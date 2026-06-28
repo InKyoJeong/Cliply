@@ -1,11 +1,12 @@
 import Foundation
-import Combine
+import Observation
 
 /// In-memory history with JSON persistence to Application Support.
 /// De-duplicates by content hash and enforces a maximum item count.
 @MainActor
-final class ClipboardStore: ObservableObject {
-    @Published private(set) var items: [ClipItem] = []
+@Observable
+final class ClipboardStore {
+    private(set) var items: [ClipItem] = []
 
     var maxHistoryCount: Int = 1000
 

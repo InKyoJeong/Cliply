@@ -2,7 +2,7 @@ import SwiftUI
 
 /// The history popup: a search field plus a keyboard-navigable result list.
 struct PopupView: View {
-    @ObservedObject var store: ClipboardStore
+    let store: ClipboardStore
 
     @State private var query = ""
     @State private var selection = 0
