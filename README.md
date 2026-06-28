@@ -15,8 +15,10 @@ Early development. Current focus:
 - [x] Sensitive-content filtering
 - [x] Fuzzy search over history
 - [x] History popup with keyboard navigation
-- [ ] Global hotkey
+- [x] Global hotkey (⌘⇧V)
 - [ ] Auto-paste into the previous app
+- [ ] Pin / favorites
+- [ ] iCloud sync
 
 ## Requirements
 
