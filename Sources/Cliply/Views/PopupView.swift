@@ -25,7 +25,6 @@ struct PopupView: View {
             hintBar
         }
         .frame(width: 360, height: 420)
-        .ignoresSafeArea(.all)
         .background(WindowAccessor { window = $0 })
         .onKeyPress(.downArrow) { move(1); return .handled }
         .onKeyPress(.upArrow) { move(-1); return .handled }
@@ -56,14 +55,18 @@ struct PopupView: View {
                             .padding(.top, 40)
                     }
                     ForEach(Array(results.enumerated()), id: \.element.id) { index, item in
-                        ClipRowView(item: item, isSelected: index == selection)
-                            .id(index)
+                        ClipRowView(item: item, isSelected: index == selection, query: query)
+                            .id(item.id)
                             .onTapGesture { selection = index; activateSelection() }
                     }
                 }
                 .padding(6)
             }
-            .onChange(of: selection) { proxy.scrollTo(selection, anchor: .center) }
+            .onChange(of: selection) {
+                if results.indices.contains(selection) {
+                    proxy.scrollTo(results[selection].id, anchor: .center)
+                }
+            }
         }
     }
 
