@@ -10,6 +10,7 @@ final class ClipboardMonitor {
     private let store: ClipboardStore
     private var lastChangeCount: Int
     private var timer: Timer?
+    private var activity: NSObjectProtocol?
 
     var pollingInterval: TimeInterval = 0.5
 
@@ -20,6 +21,15 @@ final class ClipboardMonitor {
 
     func start() {
         stop()
+
+        // As a background-only (accessory) app we would otherwise be subject to
+        // App Nap, which can suspend the polling timer and miss copies. Keep the
+        // process active so the timer fires reliably.
+        activity = ProcessInfo.processInfo.beginActivity(
+            options: .userInitiatedAllowingIdleSystemSleep,
+            reason: "Clipboard monitoring"
+        )
+
         let timer = Timer.scheduledTimer(withTimeInterval: pollingInterval, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.poll() }
         }
@@ -30,6 +40,10 @@ final class ClipboardMonitor {
     func stop() {
         timer?.invalidate()
         timer = nil
+        if let activity {
+            ProcessInfo.processInfo.endActivity(activity)
+            self.activity = nil
+        }
     }
 
     private func poll() {
