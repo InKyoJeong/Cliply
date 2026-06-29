@@ -27,10 +27,6 @@ final class PopupPanelController {
         panel.level = .floating
         panel.isReleasedWhenClosed = false
         panel.isMovableByWindowBackground = true
-        // Auto-hide when the app is deactivated (user clicks another app). This
-        // is the robust way to get "click outside closes" without the focus
-        // races that custom resign-key handling caused.
-        panel.hidesOnDeactivate = true
         panel.standardWindowButton(.closeButton)?.isHidden = true
         panel.standardWindowButton(.miniaturizeButton)?.isHidden = true
         panel.standardWindowButton(.zoomButton)?.isHidden = true
